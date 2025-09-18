@@ -1,35 +1,34 @@
 requires 'perl', '5.024';
 
 # Core modules for object-oriented programming
-requires 'Moo', '2.005005';
+requires 'Moo', '>= 2.000000';
 
 # JSON handling
-requires 'JSON::MaybeXS', '1.004005';
+requires 'JSON::MaybeXS', '>= 1.004000';
 
 # File operations
-requires 'File::Slurp', '9999.32';
+requires 'File::Slurp', '>= 9999.00';
 
 # Email functionality
-requires 'Email::Stuffer', '0.020';
+requires 'Email::Stuffer', '>= 0.015';
 
 # HTTP client for GitHub API
-requires 'Mojo::UserAgent', '9.31';
-requires 'Mojolicious', '9.31';
+requires 'Mojolicious', '>= 9.00';
 
 # Command line argument parsing
-requires 'Getopt::Long', '2.54';
+requires 'Getopt::Long', '>= 2.50';
 
 # Documentation
-requires 'Pod::Usage', '2.03';
+requires 'Pod::Usage', '>= 2.00';
 
 # Cryptographic randomness for entropy detection
-requires 'Math::Random::Secure', '0.080001';
+requires 'Math::Random::Secure', '>= 0.080001';
 
 # Base64 encoding/decoding
-requires 'MIME::Base64', '3.16';
+requires 'MIME::Base64', '>= 3.15';
 
 # Error handling
-requires 'Carp', '1.54';
+requires 'Carp', '>= 1.50';
 
 # Testing dependencies
 on 'test' => sub {

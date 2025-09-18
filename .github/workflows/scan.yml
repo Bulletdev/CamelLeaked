@@ -9,6 +9,8 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  statuses: write
+  checks: write
 
 jobs:
   security-scan:
@@ -87,15 +89,32 @@ jobs:
       run: |
         echo "🔍 Running CamelLeaked security scan..."
 
+        # Check if diff file exists and has content
+        if [ ! -f pr_changes.diff ] || [ ! -s pr_changes.diff ]; then
+          echo "ℹ️ No changes to scan (empty or missing diff file)"
+          echo "scan_result=success" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
+        echo "📊 Diff file size: $(wc -l < pr_changes.diff) lines"
+
         # Make the script executable
         chmod +x bin/camel-leaked.pl
 
-        # Run the scan
-        if perl bin/camel-leaked.pl --diff-file pr_changes.diff --config config/rules.json; then
+        # Run the scan and capture output
+        scan_output=$(perl bin/camel-leaked.pl --diff-file pr_changes.diff --config config/rules.json 2>&1) || scan_exit_code=$?
+
+        # Save scan output to file
+        echo "$scan_output" > scan_output.txt
+        echo "Scan output saved to scan_output.txt"
+
+        # Check scan result
+        if [ "${scan_exit_code:-0}" -eq 0 ]; then
           echo "✅ No secrets detected"
           echo "scan_result=success" >> $GITHUB_OUTPUT
         else
           echo "🚨 Secrets detected!"
+          echo "$scan_output"
           echo "scan_result=failure" >> $GITHUB_OUTPUT
           exit 1
         fi
@@ -152,20 +171,26 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const state = '${{ steps.scan.outputs.scan_result }}' === 'success' ? 'success' : 'failure';
-          const description = state === 'success' ?
-            '✅ No hardcoded secrets detected' :
-            '🚨 Potential secrets found - check logs';
+          try {
+            const state = '${{ steps.scan.outputs.scan_result }}' === 'success' ? 'success' : 'failure';
+            const description = state === 'success' ?
+              '✅ No hardcoded secrets detected' :
+              '🚨 Potential secrets found - check logs';
 
-          github.rest.repos.createCommitStatus({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            sha: context.sha,
-            state: state,
-            target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
-            description: description,
-            context: 'CamelLeaked Security Scan'
-          });
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: state,
+              target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              description: description,
+              context: 'CamelLeaked Security Scan'
+            });
+            console.log('Status check created successfully');
+          } catch (error) {
+            console.log('Warning: Could not create status check:', error.message);
+            // Don't fail the workflow if status check fails
+          }
 
     - name: Cleanup
       if: always()

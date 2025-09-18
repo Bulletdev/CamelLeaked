@@ -5,7 +5,7 @@ use 5.024;
 
 use Moo;
 use MIME::Base64 qw(decode_base64);
-use Math::Random::Secure qw(irand);
+use Carp qw(croak);
 
 =head1 NAME
 
