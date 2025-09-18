@@ -2,7 +2,8 @@
 
 <div align="center">
 
-![CamelLeaked Logo](https://img.shields.io/badge/🐪-CamelLeaked-orange?style=for-the-badge)
+[![CamelLeaked Security Scan](https://github.com/Bulletdev/CamelLeaked/actions/workflows/scan.yml/badge.svg)](https://github.com/Bulletdev/CamelLeaked/actions/workflows/scan.yml)
+
 
 **A powerful Perl-based security tool for detecting hardcoded secrets in code changes**
 
@@ -12,28 +13,28 @@
 
 </div>
 
-## 🎯 O que ele faz?
+##  O que ele faz?
 
 CamelLeaked é uma ferramenta de segurança defensiva projetada para detectar **segredos hardcoded** (chaves de API, senhas, tokens, etc.) em alterações de código. A ferramenta analisa diffs do Git usando padrões de expressões regulares e detecção de entropia para identificar potenciais vazamentos de credenciais **antes** que sejam commitados.
 
-### 🚨 Por que isso é importante?
+###  Por que isso é importante?
 
 - **Prevenção de vazamentos**: Detecta credenciais antes que cheguem ao repositório
 - **Automação de segurança**: Integra-se perfeitamente com GitHub Actions
 - **Notificações inteligentes**: Envia alertas por e-mail para os autores dos commits
 - **Falsos positivos controláveis**: Sistema de ignore para casos legítimos
 
-## ✨ Funcionalidades Principais
+##  Funcionalidades Principais
 
-- 🔍 **Detecção por Regex**: 15+ regras pré-configuradas para AWS, GitHub, Google, Stripe, etc.
-- 🧮 **Análise de Entropia**: Detecta strings de alta entropia que podem ser chaves secretas
-- 📧 **Notificações Automáticas**: Envia e-mails detalhados quando segredos são encontrados
-- 🔧 **Configurável**: Regras personalizáveis via arquivo JSON
-- 🚫 **Sistema de Ignore**: Comentários `# camel-leaked-ignore` para falsos positivos
-- ⚡ **CI/CD Ready**: Workflow GitHub Actions pronto para uso
-- 🧪 **Testado**: Suite completa de testes unitários
+-  **Detecção por Regex**: 15+ regras pré-configuradas para AWS, GitHub, Google, Stripe, etc.
+-  **Análise de Entropia**: Detecta strings de alta entropia que podem ser chaves secretas
+-  **Notificações Automáticas**: Envia e-mails detalhados quando segredos são encontrados
+-  **Configurável**: Regras personalizáveis via arquivo JSON
+-  **Sistema de Ignore**: Comentários `# camel-leaked-ignore` para falsos positivos
+-  **CI/CD Ready**: Workflow GitHub Actions pronto para uso
+-  **Testado**: Suite completa de testes unitários
 
-## 📦 Instalação
+##  Instalação
 
 ### Pré-requisitos
 
@@ -60,7 +61,7 @@ perl bin/camel-leaked.pl --version
 prove -l t/
 ```
 
-## ⚙️ Configuração
+## ⚙ Configuração
 
 ### 1. Configurar Regras de Detecção
 
@@ -102,7 +103,7 @@ git add .github/workflows/camel-leaked.yml
 git commit -m \"Add CamelLeaked security scanning\"
 ```
 
-## 🚀 Uso
+##  Uso
 
 ### Integração com GitHub Actions
 
@@ -166,7 +167,7 @@ perl bin/camel-leaked.pl --help
 
 ### Tipos de Detecção
 
-#### 📋 Detecção por Regex
+####  Detecção por Regex
 Regras pré-configuradas para:
 - AWS Access Keys (`AKIA[0-9A-Z]{16}`)
 - GitHub Tokens (`ghp_[A-Za-z0-9_]{36,255}`)
@@ -174,12 +175,12 @@ Regras pré-configuradas para:
 - Slack Tokens (`xox[baprs]-[0-9a-zA-Z]{10,48}`)
 - E muitos mais...
 
-#### 🧮 Detecção de Entropia
+####  Detecção de Entropia
 - Calcula entropia Shannon de strings
 - Detecta chaves aleatórias não cobertas por regex
 - Configurável (entropia mínima, tamanho mínimo)
 
-## 📝 Exemplos
+##  Exemplos
 
 ### Falso Positivo (Como Ignorar)
 
@@ -267,7 +268,7 @@ perl t/02-rules.t
 cover -test
 ```
 
-## 📊 Roadmap
+##  Roadmap
 
 - [ ] Suporte a mais formatos de diff
 - [ ] Interface web para visualização
