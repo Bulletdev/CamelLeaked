@@ -4,7 +4,6 @@
 
 [![CamelLeaked Security Scan](https://github.com/Bulletdev/CamelLeaked/actions/workflows/scan.yml/badge.svg)](https://github.com/Bulletdev/CamelLeaked/actions/workflows/scan.yml)
 
-
 **A powerful Perl-based security tool for detecting hardcoded secrets in code changes**
 
 [![Perl Version](https://img.shields.io/badge/perl-v5.24%2B-blue)](https://www.perl.org/)
