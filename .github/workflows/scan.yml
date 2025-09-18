@@ -27,7 +27,7 @@ jobs:
         perl-version: '5.38'
 
     - name: Cache CPAN modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/perl5
         key: ${{ runner.os }}-perl-${{ hashFiles('cpanfile') }}
@@ -102,7 +102,7 @@ jobs:
 
     - name: Upload scan results as artifact
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: camel-leaked-scan-results
         path: |
