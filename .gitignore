@@ -1,0 +1,103 @@
+# Perl specific
+*.swp
+*~
+.#*
+\#*#
+.DS_Store
+
+# Perl temporary files
+*.bak
+*.tmp
+*.orig
+*.rej
+
+# Perl build artifacts
+blib/
+_build/
+cover_db/
+inc/
+Build
+Build.bat
+!Build/
+.last_cover_stats
+Makefile
+Makefile.old
+MANIFEST.bak
+META.yml
+META.json
+MYMETA.yml
+MYMETA.json
+.build/
+
+# Perl module installation
+pm_to_blib
+*.bs
+*.o
+*.c
+
+# CPAN/CPANM
+local/
+.carton/
+carton.lock
+cpanfile.snapshot
+
+# Perl IDE files
+.vscode/
+.idea/
+*.iml
+
+# Local configuration files (should not be committed)
+config/rules.json
+
+# Test files
+t/test_*.json
+t/*.tmp
+cover_db/
+
+# Documentation build
+_Inline/
+perltidy.log
+
+# OS specific
+Thumbs.db
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Editor temporary files
+*~
+*.swp
+*.swo
+.#*
+
+# Log files
+*.log
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+CLAUDE.MD
+claude\
+.claude/
+.claude\
+
+
+# CamelLeaked specific
+scan_output.txt
+pr_changes.diff
+*.diff
+
+# GitHub Actions artifacts
+.github/outputs/
+
+# Perl coverage reports
+cover_db/
+coverage.html
+
+# Local testing artifacts
+test_output/
+temp/

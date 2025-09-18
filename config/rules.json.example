@@ -1,0 +1,109 @@
+{
+  "rules": [
+    {
+      "name": "AWS Access Key ID",
+      "pattern": "AKIA[0-9A-Z]{16}",
+      "description": "AWS Access Key ID - Used for programmatic access to AWS services",
+      "example": "AKIAIOSFODNN7EXAMPLE",
+      "enabled": true
+    },
+    {
+      "name": "AWS Secret Access Key",
+      "pattern": "aws.{0,20}['\"][0-9a-zA-Z/+]{40}['\"]",
+      "description": "AWS Secret Access Key - Must be kept secret and rotated regularly",
+      "example": "aws_secret_access_key = \"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"",
+      "enabled": true
+    },
+    {
+      "name": "GitHub Personal Access Token",
+      "pattern": "gh[pousr]_[A-Za-z0-9_]{36,255}",
+      "description": "GitHub Personal Access Token - Provides access to GitHub API and repositories",
+      "example": "ghp_1234567890abcdef1234567890abcdef12345678",
+      "enabled": true
+    },
+    {
+      "name": "Generic API Key",
+      "pattern": "[aA][pP][iI][_]?[kK][eE][yY].{0,30}['\"][0-9a-zA-Z]{32,}['\"]",
+      "description": "Generic API key pattern - Catches various API key formats",
+      "example": "api_key = \"1234567890abcdef1234567890abcdef\"",
+      "enabled": true
+    },
+    {
+      "name": "RSA Private Key",
+      "pattern": "-----BEGIN (RSA )?PRIVATE KEY-----",
+      "description": "RSA Private Key - Should never be committed to version control",
+      "example": "-----BEGIN RSA PRIVATE KEY-----",
+      "enabled": true
+    },
+    {
+      "name": "SSH Private Key",
+      "pattern": "-----BEGIN OPENSSH PRIVATE KEY-----",
+      "description": "OpenSSH Private Key - Should be kept secure and not committed",
+      "example": "-----BEGIN OPENSSH PRIVATE KEY-----",
+      "enabled": true
+    },
+    {
+      "name": "Google API Key",
+      "pattern": "AIza[0-9A-Za-z\\-_]{35}",
+      "description": "Google API Key - Used for accessing Google Cloud services",
+      "example": "AIzaSyDaGmWKa4JsXZ-HjGw7ISLn_3namBGewQe",
+      "enabled": true
+    },
+    {
+      "name": "Slack Token",
+      "pattern": "xox[baprs]-([0-9a-zA-Z]{10,48})",
+      "description": "Slack API Token - Provides access to Slack workspaces",
+      "example": "xoxb-1234567890-1234567890-ABCDEFGHIJKLMNOPQRSTUVWX",
+      "enabled": true
+    },
+    {
+      "name": "Stripe API Key",
+      "pattern": "sk_[live|test]_[0-9a-zA-Z]{24}",
+      "description": "Stripe API Key - Used for payment processing",
+      "example": "sk_live_1234567890abcdef1234567890ab",
+      "enabled": true
+    },
+    {
+      "name": "Facebook Access Token",
+      "pattern": "EAA[0-9A-Za-z]{90,}",
+      "description": "Facebook Access Token - Provides access to Facebook APIs",
+      "example": "EAABwzLixnjYBAPQxd6eFRlqk1v6SZAKBhKfz9yKhz8UEeYXF4f2VJX2Z",
+      "enabled": true
+    },
+    {
+      "name": "Twitter API Key",
+      "pattern": "[tT][wW][iI][tT][tT][eE][rR].{0,30}['\"][0-9a-zA-Z]{35,44}['\"]",
+      "description": "Twitter API Key - Used for accessing Twitter APIs",
+      "example": "twitter_api_key = \"AAAAAAAAAAAAAAAAAAAAAA1234567890abcdef\"",
+      "enabled": true
+    },
+    {
+      "name": "Generic Secret/Password",
+      "pattern": "[sS][eE][cC][rR][eE][tT].{0,30}['\"][0-9a-zA-Z]{20,}['\"]",
+      "description": "Generic secret or password pattern",
+      "example": "secret = \"mysupersecretpassword123\"",
+      "enabled": true
+    },
+    {
+      "name": "Database Password",
+      "pattern": "[pP][aA][sS][sS][wW][oO][rR][dD].{0,30}['\"][^'\"\\s]{8,}['\"]",
+      "description": "Database password in configuration",
+      "example": "password = \"mydbpassword123\"",
+      "enabled": true
+    },
+    {
+      "name": "JWT Token",
+      "pattern": "eyJ[A-Za-z0-9_/+\\-=]{50,}",
+      "description": "JSON Web Token - Contains encoded user information",
+      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ",
+      "enabled": true
+    },
+    {
+      "name": "Base64 Encoded Secret",
+      "pattern": "['\"][A-Za-z0-9+/]{40,}={0,2}['\"]",
+      "description": "Base64 encoded strings that might contain secrets",
+      "example": "\"dGhpc2lzYWJhc2U2NGVuY29kZWRzZWNyZXQ=\"",
+      "enabled": false
+    }
+  ]
+}

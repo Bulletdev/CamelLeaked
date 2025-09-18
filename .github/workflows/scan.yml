@@ -1,0 +1,173 @@
+name: CamelLeaked Security Scan
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+  push:
+    branches: [ main, master, develop ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  security-scan:
+    name: Scan for Hardcoded Secrets
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Perl
+      uses: shogo82148/actions-setup-perl@v1
+      with:
+        perl-version: '5.38'
+
+    - name: Cache CPAN modules
+      uses: actions/cache@v3
+      with:
+        path: ~/perl5
+        key: ${{ runner.os }}-perl-${{ hashFiles('cpanfile') }}
+        restore-keys: |
+          ${{ runner.os }}-perl-
+
+    - name: Install CPAN dependencies
+      run: |
+        curl -L https://cpanmin.us | perl - App::cpanminus
+        cpanm --local-lib=~/perl5 --installdeps .
+        echo "PERL5LIB=$HOME/perl5/lib/perl5:$PERL5LIB" >> $GITHUB_ENV
+        echo "$HOME/perl5/bin" >> $GITHUB_PATH
+
+    - name: Copy rules configuration
+      run: |
+        if [ ! -f config/rules.json ]; then
+          cp config/rules.json.example config/rules.json
+          echo "ℹ️ Using example rules configuration"
+        fi
+
+    - name: Generate diff for analysis
+      id: generate_diff
+      run: |
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          # For pull requests, diff against the base branch
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          echo "Generating diff from $BASE_SHA to $HEAD_SHA"
+          git diff $BASE_SHA...$HEAD_SHA > pr_changes.diff
+        else
+          # For push events, diff against the previous commit
+          if [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            echo "Generating diff from ${{ github.event.before }} to ${{ github.sha }}"
+            git diff ${{ github.event.before }}..${{ github.sha }} > pr_changes.diff
+          else
+            # First commit or force push - scan the entire commit
+            echo "Scanning entire commit ${{ github.sha }}"
+            git show --format="" --name-status ${{ github.sha }} > pr_changes.diff
+          fi
+        fi
+
+        # Show diff size for debugging
+        echo "Diff size: $(wc -l < pr_changes.diff) lines"
+        echo "diff_file=pr_changes.diff" >> $GITHUB_OUTPUT
+
+    - name: Run CamelLeaked security scan
+      id: scan
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_EVENT_PATH: ${{ github.event_path }}
+        SMTP_HOST: ${{ secrets.SMTP_HOST }}
+        SMTP_PORT: ${{ secrets.SMTP_PORT }}
+        SMTP_USER: ${{ secrets.SMTP_USER }}
+        SMTP_PASS: ${{ secrets.SMTP_PASS }}
+        FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+      run: |
+        echo "🔍 Running CamelLeaked security scan..."
+
+        # Make the script executable
+        chmod +x bin/camel-leaked.pl
+
+        # Run the scan
+        if perl bin/camel-leaked.pl --diff-file pr_changes.diff --config config/rules.json; then
+          echo "✅ No secrets detected"
+          echo "scan_result=success" >> $GITHUB_OUTPUT
+        else
+          echo "🚨 Secrets detected!"
+          echo "scan_result=failure" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+
+    - name: Upload scan results as artifact
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: camel-leaked-scan-results
+        path: |
+          pr_changes.diff
+          scan_output.txt
+        retention-days: 30
+
+    - name: Comment on PR (if secrets found)
+      if: failure() && github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const comment = `🚨 **SECURITY ALERT: Hardcoded Secrets Detected** 🚨
+
+          CamelLeaked has detected potential secrets in this pull request. Please review the build logs for details.
+
+          **IMMEDIATE ACTIONS REQUIRED:**
+          1. 🛑 **DO NOT MERGE** this pull request
+          2. 🔍 Review each detected secret in the build logs
+          3. 🔄 Remove or replace hardcoded secrets with:
+             - Environment variables
+             - Secure configuration files (not in git)
+             - Secret management services
+          4. 🗑️ If real secrets were committed:
+             - Rotate/regenerate the compromised credentials
+             - Update services using these credentials
+          5. ✅ Re-run the security scan to confirm fixes
+
+          **False Positive?** Add \`# camel-leaked-ignore\` at the end of the line.
+
+          **Need Help?** Contact the Security Team or refer to our security guidelines.
+
+          ---
+          🔒 *This check helps protect our codebase from credential leaks. Security is everyone's responsibility!*`;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+    - name: Set status check
+      if: always()
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const state = '${{ steps.scan.outputs.scan_result }}' === 'success' ? 'success' : 'failure';
+          const description = state === 'success' ?
+            '✅ No hardcoded secrets detected' :
+            '🚨 Potential secrets found - check logs';
+
+          github.rest.repos.createCommitStatus({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            sha: context.sha,
+            state: state,
+            target_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+            description: description,
+            context: 'CamelLeaked Security Scan'
+          });
+
+    - name: Cleanup
+      if: always()
+      run: |
+        rm -f pr_changes.diff scan_output.txt
